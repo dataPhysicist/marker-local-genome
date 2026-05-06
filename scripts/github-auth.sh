@@ -5,6 +5,9 @@
 #   - pipe token:  printf '%s' 'ghp_...' | ./scripts/github-auth.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if [ -x "$ROOT/scripts/ensure-gh.sh" ]; then
+  "$ROOT/scripts/ensure-gh.sh" >/dev/null 2>&1 || true
+fi
 export PATH="$ROOT/.local/bin:$PATH"
 
 if ! command -v gh >/dev/null 2>&1; then

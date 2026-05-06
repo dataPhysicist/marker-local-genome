@@ -6,6 +6,9 @@ OWNER="dataphysicist"
 REPO="marker-local-genome"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+if [ -x "$ROOT/scripts/ensure-gh.sh" ]; then
+  "$ROOT/scripts/ensure-gh.sh" >/dev/null 2>&1 || true
+fi
 export PATH="$ROOT/.local/bin:$PATH"
 
 if ! command -v gh >/dev/null 2>&1; then
