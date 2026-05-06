@@ -1,0 +1,33 @@
+# Builds signed-ready artifacts (unsigned by default — fine for personal distribution).
+# Trigger: push a git tag like v1.0.0
+name: Release Mac
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  mac:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Package Electron app
+        run: npx electron-builder --mac dmg zip --publish never
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.dmg
+            release/*.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
