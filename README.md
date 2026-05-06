@@ -12,7 +12,7 @@ This repository contains **no private user data**, no API keys, and no backend. 
 
 1. Push this repo to GitHub and enable **Pages** (Settings → Pages → **GitHub Actions** as the source).
 2. The workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) deploys the `dist/` build on every push to `main`.
-3. Open: `https://<your-username>.github.io/<repo-name>/`
+3. Live site: **`https://dataphysicist.github.io/marker/`** (after the first successful Pages deploy).
 
 **If your site is a username/org Pages repo** (`<username>.github.io` served from `/`), edit the workflow and set `VITE_BASE` to `/` instead of `/ ${{ github.event.repository.name }}/`.
 
@@ -22,7 +22,7 @@ This repository contains **no private user data**, no API keys, and no backend. 
 
 ### Download (recommended)
 
-1. Open [**Releases**](https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/releases) on your fork (after you publish tags—see below).
+1. Open [**Releases**](https://github.com/dataphysicist/marker/releases) (after you publish tags—see below).
 2. Download **`Marker-<version>-arm64.dmg`** for Apple Silicon Macs (GitHub Actions runner builds arm64).
 3. Open the DMG, drag **Marker** into **Applications**.
 4. **First launch (unsigned build):** Right-click **Marker** → **Open** → confirm. This is normal when Apple Developer signing isn’t configured.
@@ -40,8 +40,8 @@ CI currently publishes an **arm64** DMG from `macos-latest`. On Intel, use **Git
 Requirements: **Node.js 22+** (or 20 LTS).
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME.git
-cd YOUR_REPO_NAME
+git clone https://github.com/dataphysicist/marker.git
+cd marker
 npm ci
 npm run dev
 ```
@@ -70,29 +70,32 @@ Artifacts appear under `release/` (DMG + ZIP).
 
 ---
 
-## Publish to GitHub (first time)
+## Publish to GitHub (`dataphysicist/marker`)
 
-1. **Replace placeholders** in [`package.json`](package.json) (`YOUR_GITHUB_USERNAME`, `YOUR_REPO_NAME`) and optionally bump `version`.
-2. Initialize git and push:
+Repository URLs are already set in [`package.json`](package.json).
+
+**One-shot (recommended — GitHub CLI):**
 
 ```bash
-git init
-git add .
-git commit -m "Initial publish: Marker local genome reader"
-git branch -M main
-git remote add origin https://github.com/<you>/<repo>.git
+brew install gh   # if needed
+gh auth login     # browser login once
+cd /path/to/genomic-analyzer   # this project folder
+gh repo create dataphysicist/marker --public --source=. --remote=origin --push
+```
+
+If the repo **already exists** on GitHub:
+
+```bash
+git remote add origin https://github.com/dataphysicist/marker.git
 git push -u origin main
 ```
 
-3. Enable **GitHub Pages** from Actions (see above).
-4. **Optional Mac release:** tag and push:
+Then:
 
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
+1. Repo → **Settings → Pages → Source: GitHub Actions**.
+2. Optional Mac DMG: `git tag v1.0.0 && git push origin v1.0.0`
 
-The workflow [`.github/workflows/release-mac.yml`](.github/workflows/release-mac.yml) builds the DMG/ZIP and attaches them to the Release.
+The workflow [`.github/workflows/release-mac.yml`](.github/workflows/release-mac.yml) attaches DMG/ZIP to the Release.
 
 ---
 
