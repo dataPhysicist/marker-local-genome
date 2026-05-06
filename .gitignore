@@ -8,4 +8,6 @@ release
 .env
 .env.*
 !.env.example
+.gh-token
+.local/
 tsconfig.tsbuildinfo

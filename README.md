@@ -76,16 +76,21 @@ Artifacts appear under `release/` (DMG + ZIP).
 
 Repository URLs are set in [`package.json`](package.json).
 
-### Fast path (your Mac)
+### Fast path (this machine)
+
+**A) Personal access token (works in any terminal, including Cursor)** — create a [classic token](https://github.com/settings/tokens) with **`repo`** scope (or a fine-grained token with **Contents** + **Actions** on `marker-local-genome`).
 
 ```bash
-brew install gh          # if needed
-gh auth login            # one-time browser login
-
-cd path/to/marker-local-genome    # this repo root (folder with package.json)
-chmod +x scripts/publish-github.sh
+cd path/to/marker-local-genome   # repo root (folder with package.json)
+export PATH="$PWD/.local/bin:$PATH"
+export GH_TOKEN='paste_your_token_here'
+./scripts/github-auth.sh
 ./scripts/publish-github.sh
 ```
+
+Unset after: `unset GH_TOKEN`
+
+**B) Browser device flow** — run `gh auth login -h github.com -p https -w`, open **https://github.com/login/device**, enter the code shown, then `./scripts/publish-github.sh`.
 
 That creates **`dataphysicist/marker-local-genome`**, sets **`origin`**, and **`git push`**es **`main`**.
 

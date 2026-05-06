@@ -6,11 +6,10 @@ OWNER="dataphysicist"
 REPO="marker-local-genome"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+export PATH="$ROOT/.local/bin:$PATH"
 
 if ! command -v gh >/dev/null 2>&1; then
-  echo "Install GitHub CLI first:"
-  echo "  brew install gh"
-  echo "  gh auth login"
+  echo "Missing $ROOT/.local/bin/gh" >&2
   exit 1
 fi
 
@@ -23,6 +22,13 @@ if git remote get-url origin >/dev/null 2>&1; then
   echo "Remote 'origin' already set:"
   git remote -v
   echo "Pushing to origin..."
+  git push -u origin main
+  exit 0
+fi
+
+if gh repo view "${OWNER}/${REPO}" >/dev/null 2>&1; then
+  echo "Repo exists on GitHub; adding origin and pushing..."
+  git remote add origin "https://github.com/${OWNER}/${REPO}.git"
   git push -u origin main
   exit 0
 fi
