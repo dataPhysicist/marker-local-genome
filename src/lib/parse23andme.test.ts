@@ -23,4 +23,16 @@ describe("parse23andme", () => {
       ]),
     ).toBe("GRCh37");
   });
+
+  it("parses Ancestry-style allele1/allele2 rows", () => {
+    const text = `# AncestryDNA raw data\nrsid\tchromosome\tposition\tallele1\tallele2\nrs111\t1\t1001\tT\tC\n`;
+    const { variants } = parseRawGenotypes(text);
+    expect(variants.rs111.genotype).toBe("CT");
+  });
+
+  it("handles Ancestry no-call rows", () => {
+    const text = `rsid chromosome position allele1 allele2\nrs222\t1\t2002\t0\t0\n`;
+    const { variants } = parseRawGenotypes(text);
+    expect(variants.rs222.genotype).toBe("00");
+  });
 });

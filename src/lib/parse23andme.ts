@@ -20,7 +20,7 @@ export function sniffBuildFromHeader(headerLines: string[]): string | undefined 
 
 function normalizeGenotype(g: string): string {
   const s = g.trim().toUpperCase();
-  if (s === "--" || s === "-" || s === "DD") return s;
+  if (s === "--" || s === "-" || s === "DD" || s === "00") return s;
   if (s.length === 2) {
     const [a, b] = s.split("");
     return [a, b].sort().join("");
@@ -58,7 +58,7 @@ export function parseRawGenotypes(text: string): {
       continue;
     }
 
-    const [rsidRaw, chromosome, posRaw, genotypeRaw] = parts;
+    const [rsidRaw, chromosome, posRaw, col4Raw, col5Raw] = parts;
     let rsid = rsidRaw.trim().toLowerCase();
     if (!rsid.startsWith("rs") && /^\d+$/.test(rsid)) rsid = `rs${rsid}`;
 
@@ -71,6 +71,10 @@ export function parseRawGenotypes(text: string): {
     if (variants[rsid]) {
       duplicateRsids.push(rsid);
     }
+
+    // 23andMe commonly provides: rsid chr pos genotype (4 cols)
+    // Ancestry commonly provides: rsid chr pos allele1 allele2 (5 cols)
+    const genotypeRaw = col5Raw ? `${col4Raw}${col5Raw}` : col4Raw;
 
     variants[rsid] = {
       rsid,
