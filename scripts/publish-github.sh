@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Create github.com/dataphysicist/marker-local-genome and push main (requires: gh, logged in).
+# Create github.com/<owner>/marker-local-genome and push main (requires: gh, logged in).
 set -euo pipefail
 
-OWNER="dataphysicist"
 REPO="marker-local-genome"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -15,6 +14,8 @@ if ! command -v gh >/dev/null 2>&1; then
   echo "Missing $ROOT/.local/bin/gh" >&2
   exit 1
 fi
+
+OWNER="${GITHUB_OWNER:-$(gh api user -q .login)}"
 
 if ! gh auth status >/dev/null 2>&1; then
   echo "Run: gh auth login"
