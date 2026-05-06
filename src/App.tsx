@@ -13,13 +13,14 @@ import {
   type WheelEvent as ReactWheel,
 } from "react";
 import "./styles/global.css";
-import { enrichRsidsHybrid } from "./lib/enrichment/myvariant";
+import { enrichRsidsHybrid, hasParsedEnrichment } from "./lib/enrichment/myvariant";
 import { buildRawBundle, buildFullBundle } from "./lib/export/bundles";
 import { mapQcToSourceSlice } from "./lib/export/mapQc";
 import { analyzeGenome } from "./lib/interpret/analyze";
 import { loadKb } from "./lib/kb/loadKb";
 import type {
   AnalyzeResult,
+  EnrichmentRecord,
   Finding,
   HaplotypeCard,
   QcReport,
@@ -1244,6 +1245,7 @@ function ExportsSection({
   clinician,
   enrichStatus,
   enrichBusy,
+  enrichment,
   analysisReady,
 }: {
   onExportRaw: () => void;
@@ -1252,8 +1254,21 @@ function ExportsSection({
   clinician: () => void;
   enrichStatus: string | null;
   enrichBusy: boolean;
+  enrichment: Record<string, EnrichmentRecord> | null;
   analysisReady: boolean;
 }) {
+  const enrichmentValues = enrichment ? Object.values(enrichment) : [];
+  const enrichmentSummary =
+    enrichmentValues.length > 0
+      ? {
+          fetched: enrichmentValues.filter((r) => !r.error).length,
+          parsed: enrichmentValues.filter(hasParsedEnrichment).length,
+          genes: new Set(enrichmentValues.flatMap((r) => r.genes ?? [])).size,
+          clinical: enrichmentValues.filter((r) => r.clinical_significances?.length).length,
+          failed: enrichmentValues.filter((r) => r.error).length,
+        }
+      : null;
+
   return (
     <section className="section">
       <SectionHeader
@@ -1328,6 +1343,14 @@ function ExportsSection({
         {enrichStatus && (
           <p style={{ marginTop: "0.7rem", fontSize: "0.82rem", color: "var(--muted)" }}>
             {enrichStatus}
+          </p>
+        )}
+        {enrichmentSummary && (
+          <p style={{ marginTop: "0.45rem", fontSize: "0.82rem", color: "var(--muted)" }}>
+            Fetched {enrichmentSummary.fetched} rsIDs; parsed fields for{" "}
+            {enrichmentSummary.parsed}; found {enrichmentSummary.genes} unique gene names and{" "}
+            {enrichmentSummary.clinical} clinical-significance rows;{" "}
+            {enrichmentSummary.failed} failed.
           </p>
         )}
       </div>
@@ -1486,10 +1509,10 @@ export default function App() {
         const prev = st.enrichment ?? {};
         st.setEnrichment(prev, `${d}/${total} rsIDs fetched`);
       });
-      const okCount = resp.records
-        ? Object.values(resp.records).filter((r) => !r.error).length
-        : 0;
-      if (resp.blocked && !resp.records) {
+      const records = resp.records ?? {};
+      const fetchedCount = Object.values(records).filter((r) => !r.error).length;
+      const enrichedCount = Object.values(records).filter(hasParsedEnrichment).length;
+      if (resp.blocked) {
         store.setEnrichment(
           {},
           resp.error ??
@@ -1497,17 +1520,24 @@ export default function App() {
         );
         return;
       }
-      if (!resp.records || okCount === 0) {
+      if (fetchedCount === 0) {
         store.setEnrichment(
-          resp.records ?? {},
+          records,
           resp.error ??
             "No enrichment rows succeeded — endpoints may reject this environment.",
         );
         return;
       }
+      if (enrichedCount === 0) {
+        store.setEnrichment(
+          records,
+          "Variant links were fetched, but MyVariant returned no gene or clinical-significance fields for these rsIDs.",
+        );
+        return;
+      }
       store.setEnrichment(
-        resp.records,
-        "Enrichment merged into session (export full JSON to retain).",
+        records,
+        `Enrichment merged into session (${enrichedCount}/${fetchedCount} rsIDs had parsed fields; export full JSON to retain).`,
       );
     } finally {
       store.setEnrichBusy(false);
@@ -1581,6 +1611,7 @@ export default function App() {
               onEnrich={() => void handleEnrich()}
               enrichStatus={enrichStatus}
               enrichBusy={enrichBusy}
+              enrichment={enrich}
               clinician={() =>
                 analysis &&
                 downloadText(
