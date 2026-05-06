@@ -4,6 +4,9 @@
   "description": "Marker — local-first 23andMe-style genotype reading in your browser or Mac app.",
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "private": false,
   "license": "MIT",
   "author": "",
