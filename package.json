@@ -12,12 +12,12 @@
   "author": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dataphysicist/marker.git"
+    "url": "https://github.com/dataphysicist/marker-local-genome.git"
   },
   "bugs": {
-    "url": "https://github.com/dataphysicist/marker/issues"
+    "url": "https://github.com/dataphysicist/marker-local-genome/issues"
   },
-  "homepage": "https://github.com/dataphysicist/marker#readme",
+  "homepage": "https://github.com/dataphysicist/marker-local-genome#readme",
   "keywords": [
     "genomics",
     "23andme",

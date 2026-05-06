@@ -2,7 +2,9 @@
 
 **Local-first** reading of 23andMe-style raw genotype text. Your file is parsed and interpreted in the browser (or in the optional Mac app). Optional enrichment looks up **public rsID metadata only**—never your full file.
 
-This repository contains **no private user data**, no API keys, and no backend. Safe to make public on GitHub.
+Repository: **`dataphysicist/marker-local-genome`** — name matches the npm package and reads clearly as “local genome” tooling (better than a bare `marker`, which is overloaded on GitHub).
+
+This repo contains **no private user data**, no API keys, and no backend.
 
 ---
 
@@ -12,7 +14,7 @@ This repository contains **no private user data**, no API keys, and no backend. 
 
 1. Push this repo to GitHub and enable **Pages** (Settings → Pages → **GitHub Actions** as the source).
 2. The workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) deploys the `dist/` build on every push to `main`.
-3. Live site: **`https://dataphysicist.github.io/marker/`** (after the first successful Pages deploy).
+3. Live site: **`https://dataphysicist.github.io/marker-local-genome/`** (after the first successful Pages deploy).
 
 **If your site is a username/org Pages repo** (`<username>.github.io` served from `/`), edit the workflow and set `VITE_BASE` to `/` instead of `/ ${{ github.event.repository.name }}/`.
 
@@ -22,7 +24,7 @@ This repository contains **no private user data**, no API keys, and no backend. 
 
 ### Download (recommended)
 
-1. Open [**Releases**](https://github.com/dataphysicist/marker/releases) (after you publish tags—see below).
+1. Open [**Releases**](https://github.com/dataphysicist/marker-local-genome/releases) (after you publish tags—see below).
 2. Download **`Marker-<version>-arm64.dmg`** for Apple Silicon Macs (GitHub Actions runner builds arm64).
 3. Open the DMG, drag **Marker** into **Applications**.
 4. **First launch (unsigned build):** Right-click **Marker** → **Open** → confirm. This is normal when Apple Developer signing isn’t configured.
@@ -40,8 +42,8 @@ CI currently publishes an **arm64** DMG from `macos-latest`. On Intel, use **Git
 Requirements: **Node.js 22+** (or 20 LTS).
 
 ```bash
-git clone https://github.com/dataphysicist/marker.git
-cd marker
+git clone https://github.com/dataphysicist/marker-local-genome.git
+cd marker-local-genome
 npm ci
 npm run dev
 ```
@@ -70,29 +72,41 @@ Artifacts appear under `release/` (DMG + ZIP).
 
 ---
 
-## Publish to GitHub (`dataphysicist/marker`)
+## Publish to GitHub (`dataphysicist/marker-local-genome`)
 
-Repository URLs are already set in [`package.json`](package.json).
+Repository URLs are set in [`package.json`](package.json).
 
-**One-shot (recommended — GitHub CLI):**
+### Fast path (your Mac)
 
 ```bash
-brew install gh   # if needed
-gh auth login     # browser login once
-cd /path/to/genomic-analyzer   # this project folder
-gh repo create dataphysicist/marker --public --source=. --remote=origin --push
+brew install gh          # if needed
+gh auth login            # one-time browser login
+
+cd path/to/marker-local-genome    # this repo root (folder with package.json)
+chmod +x scripts/publish-github.sh
+./scripts/publish-github.sh
 ```
 
-If the repo **already exists** on GitHub:
+That creates **`dataphysicist/marker-local-genome`**, sets **`origin`**, and **`git push`**es **`main`**.
+
+### Manual `gh` one-liner
 
 ```bash
-git remote add origin https://github.com/dataphysicist/marker.git
+cd /path/to/marker-local-genome
+gh repo create dataphysicist/marker-local-genome --public --source=. --remote=origin --push \
+  --description "Marker — local-first genotype reader (browser + optional Mac app)"
+```
+
+If the repo **already exists**:
+
+```bash
+git remote add origin https://github.com/dataphysicist/marker-local-genome.git
 git push -u origin main
 ```
 
-Then:
+### After the first push
 
-1. Repo → **Settings → Pages → Source: GitHub Actions**.
+1. **Settings → Pages → Source: GitHub Actions**.
 2. Optional Mac DMG: `git tag v1.0.0 && git push origin v1.0.0`
 
 The workflow [`.github/workflows/release-mac.yml`](.github/workflows/release-mac.yml) attaches DMG/ZIP to the Release.
