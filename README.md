@@ -78,6 +78,8 @@ Repository URLs are set in [`package.json`](package.json).
 
 ### Fast path (this machine)
 
+**Prerequisite:** GitHub CLI in `.local/bin/gh` (bundled path). If missing: `chmod +x scripts/ensure-gh.sh && ./scripts/ensure-gh.sh`
+
 **A) Personal access token (works in any terminal, including Cursor)** — create a [classic token](https://github.com/settings/tokens) with **`repo`** scope (or a fine-grained token with **Contents** + **Actions** on `marker-local-genome`).
 
 ```bash
